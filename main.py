@@ -41,11 +41,11 @@ class InitializeVariable:
         self.varType = "int"
 
     def translate(self):
-        self.outputCode = ".EQU " + self.variableToSet + ", MEMORY LOCATION\n.EQU @, MEMORY LOCATION\n.WORD 0"
+        self.outputCode = "\t.EQU " + self.variableToSet + ", MEMORY LOCATION\n\t.EQU @, MEMORY LOCATION\n\t.WORD 0"
 
     # we actually need a second translate function that adds in the memory #'s once we've calculated those
     def translateWithMemory(self, memoryLocation):
-        self.outputCode = ".EQU " + self.variableToSet + ", "+str(memoryLocation)+"\n.EQU @, "+str(memoryLocation)+"\n.WORD 0"
+        self.outputCode = "\t.EQU " + self.variableToSet + ", "+str(memoryLocation)+"\n\t.EQU @, "+str(memoryLocation)+"\n\t.WORD 0"
 
 
 # Set existing variable equal to something
@@ -84,11 +84,11 @@ class SetVariable:
                 self.numLines += setup.numLines
 
         if not arithmetic:
-            setupText = "LDA# " + self.something
+            setupText = "\tLDA# " + self.something
             self.numLines += 1
 
         self.numLines += 1
-        self.outputCode =  setupText + "STA " + self.variableToSet
+        self.outputCode =  setupText + "\tSTA " + self.variableToSet
 
 
 # Operations
@@ -126,24 +126,24 @@ class Operation:
     def translate(self):
 
         if self.isVariable(self.leftSide):
-            self.outputCode += "LDA " + self.leftSide
+            self.outputCode += "\tLDA " + self.leftSide
         else:
-            self.outputCode += "LDA# " + self.leftSide
+            self.outputCode += "\tLDA# " + self.leftSide
 
         if self.symbol == "+":
-            self.outputCode += "\nADA"
+            self.outputCode += "\n\tADA"
 
         elif self.symbol == "-":
-            self.outputCode += "\nSBA"
+            self.outputCode += "\n\tSBA"
 
         elif self.symbol == "*":
-            self.outputCode += "\nMUL"
+            self.outputCode += "\n\tMUL"
 
         elif self.symbol == "/":
-            self.outputCode += "\nDIV"
+            self.outputCode += "\n\tDIV"
 
         else:
-            self.outputCode += "MOD"
+            self.outputCode += "\tMOD"
 
         if self.isVariable(self.rightSide):
             self.outputCode += " " + self.rightSide + "\n"
@@ -206,9 +206,9 @@ for action in actions:
     else:
         if firstLine:
             firstLine = False
-            outputFile.write(".EQU @, $000\n")
+            outputFile.write("\t.EQU @, $000\n")
 
         outputFile.write(action.outputCode + "\n")
 
-outputFile.write("HLT")
+outputFile.write("\tHLT")
 outputFile.close()

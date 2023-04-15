@@ -1,18 +1,18 @@
-.EQU var1, 10
-.EQU @, 10
-.WORD 0
-.EQU var2, 11
-.EQU @, 11
-.WORD 0
-.EQU sum, 12
-.EQU @, 12
-.WORD 0
-.EQU @, $000
-LDA# 1
-STA var1
-LDA# 1
-STA var2
-LDA var1
-ADA var2
-STA sum
-HLT
+	.EQU var1, 10
+	.EQU @, 10
+	.WORD 0
+	.EQU var2, 11
+	.EQU @, 11
+	.WORD 0
+	.EQU sum, 12
+	.EQU @, 12
+	.WORD 0
+	.EQU @, $000
+	LDA# 1
+	STA var1
+	LDA# 1
+	STA var2
+	LDA var1
+	ADA var2
+	STA sum
+	HLT
