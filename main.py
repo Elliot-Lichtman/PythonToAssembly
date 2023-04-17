@@ -151,6 +151,49 @@ class Operation:
             self.outputCode += "# " + self.rightSide + "\n"
 
 
+# Conditionals:
+# This includes a condition and a place to jump to
+class Conditional:
+
+    def __init__(self, condition, indentedBlock):
+        self.condition = condition
+
+        self.outputCode = ""
+        self.numLines = 0
+
+        self.actionType = "conditional"
+
+    def translate(self):
+        
+
+# Functions:
+# This is what I'm calling anything that we will jump to in the code that isn't a loop
+# They will be a set of instructions stored in memory AFTER the main program
+# Pieces of the program will access them by jumping
+class Function:
+
+    def __init__(self, name, python):
+        # the text from the input file
+        self.python = python
+
+        # the name by which we will reference the function
+        self.name = name
+
+        # the text of all the assembly code to complete this line of python code
+        self.outputCode = ""
+        # The number of lines of that output code (to make allocating memory easier)
+        self.numLines = 2
+
+        self.actionType = "function"
+
+    def translate(self):
+        self.outputCode += "\t.EQU @, MEMORY LOCATION\n"+self.name+":\t"
+
+
+
+
+
+
 # Now to start actually parsing the code we need a list of actions
 actions = []
 
@@ -172,18 +215,60 @@ while current != "":
 
     current = file.readline()
 
+# this function takes in as input an array with all the lines of code and how many times they were indented
+# it returns an array of actions
+def parseCode(text):
+    actions = []
+    skip = []
+    for line in range(len(text)):
+        if line not in skip:
+            if "if " in text[line][1]:
+                indentedBlock = []
+
+                # append all the code in the indented block to a new action
+                counter = 1
+                while line + counter < len(text) and text[line+counter][0] == text[line][0]+1:
+                    indentedBlock.append(copyList(text[line]))
+                    skip.append(line+counter)
+                    counter += 1
+                actions.append(Conditional(text[line], indentedBlock))
+
+            # we need to classify the type of action that current is
+            # this means we're setting or initializing a variable
+            if " = " in text[line][1]:
+                actions.append(SetVariable(text[line][1]))
+
+    return copyList(actions)
+
+# general utility function
+def copyList(list):
+    newList = []
+    for item in list:
+        newList.append(item)
+    return newList
+
 # now we reset for the second pass
 file = open("inputFile.txt", "r")
 current = file.readline()
 
+# now we just read and get a copy of the text
+# we'll store this in an array of 2 index lists in the form [line of code, # of indentations]
+text = []
 while current != "":
-
-    # we need to classify the type of action that current is
-    # this means we're setting or initializing a variable
-    if " = " in current:
-        actions.append(SetVariable(current))
+    line = [0, ""]
+    while current[0] == " ":
+            current = current[1:]
+            line[0] += 1
+    line[1] = current
+    # 4 spaces is an indentation
+    line[0] //= 4
+    text.append(copyList(line))
 
     current = file.readline()
+
+
+actions = parseCode(text)
+
 
 
 # now we need to figure out where to store the variables

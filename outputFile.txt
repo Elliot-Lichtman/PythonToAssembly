@@ -1,10 +1,10 @@
 	.EQU var1, 10
 	.EQU @, 10
 	.WORD 0
-	.EQU var2, 11
+	.EQU     var2, 11
 	.EQU @, 11
 	.WORD 0
-	.EQU sum, 12
+	.EQU         sum, 12
 	.EQU @, 12
 	.WORD 0
 	.EQU @, $000
